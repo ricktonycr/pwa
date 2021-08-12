@@ -91,7 +91,7 @@
               myBody = JSON.stringify(body);
               console.log(myBody);
               loading.style.display = 'block';
-              const response = await fetch('http://192.168.0.155:5000/diagnosis', {
+              const response = await fetch('https://ec2-54-145-55-237.compute-1.amazonaws.com:5000/diagnosis', {
                   mode: 'cors',
                   method: 'POST',
                   body: myBody, // string or object
