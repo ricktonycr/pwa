@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <!-- ios support -->
+    <link rel="apple-touch-icon" href="images/icons/icon-72x72.png">
+    <link rel="apple-touch-icon" href="images/icons/icon-96x96.png">
+    <link rel="apple-touch-icon" href="images/icons/icon-128x128.png">
+    <link rel="apple-touch-icon" href="images/icons/icon-144x144.png">
+    <link rel="apple-touch-icon" href="images/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" href="images/icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="images/icons/icon-384x384.png">
+    <link rel="apple-touch-icon" href="images/icons/icon-512x512.png">
+    <meta name="apple-mobile-web-app-status-bar" content="#db4938">
+    <meta name="theme-color" content="#db4938">
+    <title>Dev'Coffee PWA</title>
+    <style>
+      .dissapear{
+        display: none
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+        <select name="Edad" id="edad">
+          <option value="0">--</option>
+          <option value="1">1 a 2 meses</option>
+          <option value="2">3 a 4 meses</option>
+          <option value="3">5 a 6 meses</option>
+          <option value="4">7 a 9 meses</option>
+          <option value="5">2 a 3 años</option>
+          <option value="6">3 a 5 años</option>
+        </select>
+        <br>
+        <select name="Sexo" id="sexo">
+          <option value="0">--</option>
+          <option value="F">Femenino</option>
+          <option value="M">Masculino</option>
+        </select>
+        <br>
+        <input type="file" accept="image/*;capture=camera" id="file-input">
+        <br>
+        <img style="width: 100%;" src="" id="image" alt="">
+        <br>
+        <img style="width: 100px; left:250px;" src="images/loading.gif" id="loading" alt="">
+        <br>
+        <p id="Resultado"></p>
+        <p id="Tiempo"></p>
+        <script>
+          const edad      = document.getElementById('edad');
+          const sexo      = document.getElementById('sexo');
+          const fileInput = document.getElementById('file-input');
+          const q         = document.getElementById('image');
+          const result    = document.getElementById('Resultado');
+          const time      = document.getElementById('Tiempo');
+          const loading   = document.getElementById('loading');
+          loading.style.display = 'none';
+          var d11 = 0;
+          var d12 = 0;
+          var d21 = 0;
+          var d22 = 0;
+          var reader = new FileReader();
+          
+          edad.addEventListener('change', (e) => desaparecer(e.srcElement));
+          sexo.addEventListener('change', (e) => desaparecer(e.srcElement));
+          const desaparecer = (e) =>{
+            e.disabled = true;
+          }
+          fileInput.addEventListener('change', (e) => doSomethingWithFiles(e.target.files));
+
+          const doSomethingWithFiles = async (image) => {
+            if(edad.value != '0' && sexo.value != '0'){
+              i = image[0];
+              reader.readAsDataURL(i);
+              reader.onload = enviar;
+
+            }else{
+              alert("Debe seleccionar la edad y el sexo antes de ingresar la imagen.");
+            }
+          }
+
+          const enviar = async () => {
+              s = reader.result.split(',')[1];
+              q.src = 'data:image/jpg;base64,'+s;
+              body={};
+              body.image = s;
+              myBody = JSON.stringify(body);
+              console.log(myBody);
+              loading.style.display = 'block';
+              const response = await fetch('http://192.168.0.155:5000/diagnosis', {
+                  mode: 'cors',
+                  method: 'POST',
+                  body: myBody, // string or object
+                  headers: {
+                      'Content-Type': 'text/plain'
+                  }
+              });
+              const myJson = await response.text(); //extract JSON from the http response
+              // do something with myJson
+              console.log(myJson);
+              obj = JSON.parse(myJson);
+              q.src = 'data:image/jpg;base64,'+obj.imageData;
+
+              switch(edad.value){
+                case "1":
+                  if(sexo.value == 'F'){
+                    d11 = 36;
+                    d12 = 36;
+                    d21 = 41.5;
+                    d22 = 41.5;
+                  }
+                  if(sexo.value == 'M'){
+                    d11 = 29;
+                    d12 = 31;
+                    d21 = 33;
+                    d22 = 35;
+                  }
+                  break;
+                case "2":
+                  if(sexo.value == 'F'){
+                    d11 = 31.5;
+                    d12 = 33;
+                    d21 = 36.5;
+                    d22 = 38.5;
+                  }
+                  if(sexo.value == 'M'){
+                    d11 = 28;
+                    d12 = 29;
+                    d21 = 32.5;
+                    d22 = 33.5;
+                  }
+                  break;
+                case "3":
+                  if(sexo.value == 'F'){
+                    d11 = 37.5;
+                    d12 = 39.5;
+                    d21 = 32;
+                    d22 = 34;
+                  }
+                  if(sexo.value == 'M'){
+                    d11 = 24.5;
+                    d12 = 27;
+                    d21 = 29;
+                    d22 = 31.5;
+                  }
+                  break;
+                case "4":
+                  if(sexo.value == 'F'){
+                    d11 = 25.5;
+                    d12 = 27;
+                    d21 = 29.5;
+                    d22 = 31.5;
+                  }
+                  if(sexo.value == 'M'){
+                    d11 = 24.5;
+                    d12 = 25.5;
+                    d21 = 29;
+                    d22 = 29.5;
+                  }
+                  break;
+                case "5":
+                  if(sexo.value == 'F'){
+                    d11 = 22;
+                    d12 = 23.5;
+                    d21 = 25.5;
+                    d22 = 27;
+                  }
+                  if(sexo.value == 'M'){
+                    d11 = 21;
+                    d12 = 22.5;
+                    d21 = 25;
+                    d22 = 27;
+                  }
+                  break;
+                case "6":
+                  if(sexo.value == 'F'){
+                    d11 = 18;
+                    d12 = 21;
+                    d21 = 25.5;
+                    d22 = 25.5;
+                  }
+                  if(sexo.value == 'M'){
+                    d11 = 19;
+                    d12 = 20;
+                    d21 = 23.5;
+                    d22 = 24;
+                  }
+                  break;
+              }
+
+              var w = 'Considerando los ángulos acetabulares, no tiene riesgo de displacia de cadera.';
+              if(obj.deg1 > d11 || obj.deg2 > d12)
+                w = 'Considerando los ángulos acetabulares, tiene riesgo leve de displacia de cadera.';
+              if(obj.deg1 > d21 || obj.deg2 > d22)
+                w = 'Considerando los ángulos acetabulares, tiene riesgo grave de displacia de cadera.';
+                result.innerHTML = w;
+              
+              t = 'Tiempo de proceso: ' + (Math.floor(obj.time/60)) + ' minutos, ' + (Math.floor(obj.time%60)) + ' segundos'
+              time.innerHTML = t;
+              loading.style.display = 'none';
+          }
+        </script>
+    </main>
+    <script src="js/app.js"></script>
+  </body>
+</html>
